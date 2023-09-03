@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ExportController;
 use App\Http\Controllers\MainController;
+use App\Http\Controllers\ResumeController;
 use App\Http\Controllers\TestController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -111,6 +112,21 @@ Route::get('/post/{id?}', [MainController::class, 'post'])->name('post');
 Route::get('export', ExportController::class);
 
 Route::get('/user/{name}/{age}', [UserController::class, 'user']);
+
+
+
+
+Route::prefix('personal')->name('personal.')->group(function() {
+    Route::get('/', [ResumeController::class, 'index'])->name('index');
+    Route::get('/contact', [ResumeController::class, 'contact'])->name('contact');
+    Route::get('/projects', [ResumeController::class, 'projects'])->name('projects');
+    Route::get('/resume', [ResumeController::class, 'resume'])->name('resume');
+});
+
+
+
+
+
 
 //
 
