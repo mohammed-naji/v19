@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CoffeeController;
+use App\Http\Controllers\CourseController;
 use App\Http\Controllers\ExportController;
 use App\Http\Controllers\MainController;
 use App\Http\Controllers\ResumeController;
@@ -132,6 +133,18 @@ Route::prefix('coffee')->name('coffee.')->group(function() {
     Route::get('/store', [CoffeeController::class, 'store'])->name('store');
 });
 
+Route::prefix('courses')->name('courses.')->group(function() {
+
+    Route::get('/', [CourseController::class, 'index'])->name('index');
+    Route::get('/about', [CourseController::class, 'about'])->name('about');
+    Route::get('/blog', [CourseController::class, 'blog'])->name('blog');
+    Route::get('/blog_details', [CourseController::class, 'blog_details'])->name('blog_details');
+    Route::get('/contact', [CourseController::class, 'contact'])->name('contact');
+    Route::get('/courses', [CourseController::class, 'courses'])->name('courses');
+    Route::get('/login', [CourseController::class, 'login'])->name('login');
+    Route::get('/register', [CourseController::class, 'register'])->name('register');
+
+});
 
 
 //
