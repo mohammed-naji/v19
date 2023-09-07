@@ -3,6 +3,7 @@
 use App\Http\Controllers\CoffeeController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\ExportController;
+use App\Http\Controllers\FormController;
 use App\Http\Controllers\MainController;
 use App\Http\Controllers\ResumeController;
 use App\Http\Controllers\TestController;
@@ -145,6 +146,13 @@ Route::prefix('courses')->name('courses.')->group(function() {
     Route::get('/register', [CourseController::class, 'register'])->name('register');
 
 });
+
+
+Route::get('form1', [FormController::class, 'form1'])->name('form1');
+Route::post('form1', [FormController::class, 'form1_data']);
+
+Route::get('form2', [FormController::class, 'form2'])->name('form2');
+Route::post('form2', [FormController::class, 'form2_data'])->name('form2_data');
 
 
 //
