@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Rules\WordCount;
 use Illuminate\Http\Request;
 
 class FormController extends Controller
@@ -45,5 +46,25 @@ class FormController extends Controller
         $email = $request->email;
 
         return view('forms.form2_info', compact('name', 'email'));
+    }
+
+    function form3() {
+        return view('forms.form3');
+    }
+
+    function form3_data(Request $request) {
+
+        $request->validate([
+            'name' => 'required',
+            'email' => 'required|email|ends_with:@gmail.com,@hotmail.com',
+            'password' => 'required|min:8|confirmed',
+            'dob' => 'required|before:'.now()->subYears(18),
+            'gender' => 'required',
+            'education_level' => 'required',
+            'hobbies' => 'required',
+            'bio' => ['required', new WordCount(20)],
+        ]);
+
+        dd($request->all());
     }
 }
