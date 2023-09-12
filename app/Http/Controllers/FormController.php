@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\ContactMail;
+use App\Mail\TestMail;
 use App\Rules\WordCount;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 
 class FormController extends Controller
 {
@@ -67,4 +70,58 @@ class FormController extends Controller
 
         dd($request->all());
     }
+
+    function form4() {
+        return view('forms.form4');
+    }
+
+    function form4_data(Request $request) {
+        $request->validate([
+            'name' => 'required',
+            'image' => 'required|image|mimes:png,jpg,gif|max:512'
+        ]
+        // , [
+        //     'name.required' => ' اخوي الاسم مطلوب الله يجوزك ',
+        //     'mimes' => 'هذا الامتداد غير مدعوم'
+        // ]
+    );
+        // dd($request->all());
+
+        // public_path('images') => c:\wamp64\www\v19\public\images
+        // asset('images') => https://127.0.0.1/images
+
+        // $img_name = $_FILES['image']['name'];
+
+        // dd($_FILES['image']['name']);
+
+        // zina.png => 64646496564987zina.png
+
+        $img_name = rand() . time() . $request->file('image')->getClientOriginalName();
+        $request->file('image')->move(public_path('images'), $img_name);
+        // move_uploaded_file('tmp', 'images');
+
+        return view('forms.form4_image', compact('img_name'));
+    }
+
+    function contact() {
+        return view('forms.contact');
+    }
+
+    function contact_data(Request $request) {
+        // dd($request->all());
+        $request->validate([
+            "name" => "required",
+            "email" => "required",
+            "phone" => "required",
+            "subject" => "required",
+            "message" => "required",
+        ]);
+
+        $data = $request->except('_token');
+        // Mail::to('admin@gmail.com')->send(new TestMail());
+        Mail::to('maramhania29@gmail.com')->send(new ContactMail($data));
+    }
 }
+
+
+//
