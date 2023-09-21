@@ -5,6 +5,7 @@ use App\Http\Controllers\CourseController;
 use App\Http\Controllers\ExportController;
 use App\Http\Controllers\FormController;
 use App\Http\Controllers\MainController;
+use App\Http\Controllers\PostController;
 use App\Http\Controllers\ResumeController;
 use App\Http\Controllers\TestController;
 use App\Http\Controllers\UserController;
@@ -166,3 +167,17 @@ Route::post('contact', [FormController::class, 'contact_data'])->name('contact_d
 
 //
 
+// CRUD routes for posts
+// Route::get('posts', [PostController::class, 'index'])->name('posts.index');
+// Route::get('posts/{post}', [PostController::class, 'show'])->name('posts.show');
+
+// Route::get('posts/create', [PostController::class, 'create'])->name('posts.create');
+// Route::post('posts', [PostController::class, 'store'])->name('posts.store');
+
+// Route::get('posts/{post}/edit', [PostController::class, 'edit'])->name('posts.edit');
+// Route::match(['put', 'patch'],'posts/{post}', [PostController::class, 'update'])->name('posts.update');
+
+// Route::delete('posts/{post}', [PostController::class, 'destroy'])->name('posts.destroy');
+
+Route::resource('posts', PostController::class);
+//
