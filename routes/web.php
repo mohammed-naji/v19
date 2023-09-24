@@ -180,4 +180,5 @@ Route::post('contact', [FormController::class, 'contact_data'])->name('contact_d
 // Route::delete('posts/{post}', [PostController::class, 'destroy'])->name('posts.destroy');
 
 Route::resource('posts', PostController::class);
+Route::get('search-post', [PostController::class, 'search_post'])->name('search_post');
 //

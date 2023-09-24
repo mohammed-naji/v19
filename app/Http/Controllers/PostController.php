@@ -10,7 +10,7 @@ class PostController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         //
         // $sql = "SELECT * FROM posts";
@@ -23,7 +23,16 @@ class PostController extends Controller
         // $posts = Post::orderBy('id', 'DESC')->get();
         // $posts = Post::orderBy('id', 'DESC')->simplepaginate();
         // $posts = Post::orderBy('updated_at', 'DESC')->paginate();
-        $posts = Post::latest('id')->paginate();
+
+        if($request->has('q')) {
+            $posts = Post::where('title', 'like', '%'.$request->q.'%')
+            ->latest('id')
+            ->paginate(10);
+        }else {
+            $posts = Post::latest('id')->paginate(10);
+        }
+
+
 
         // $page = 1;
         // $offset = ($page - 1) * 10
@@ -53,16 +62,17 @@ class PostController extends Controller
      */
     public function show(string $id)
     {
-        $post = Post::find($id);
+        // $post = Post::find($id); // SELECT * FROM posts WHERE id = $id
 
-        if(!$post) {
-            // abort(404);
-            return redirect()->back();
-        }
+        // dd($post);
+        // if(!$post) {
+        //     abort(404);
+        //     // return redirect()->back();
+        // }
 
-        // $post = Post::findOrFail($id);
+        $post = Post::findOrFail($id);
 
-        return view('posts.show', compact('post'));
+        // return view('posts.show', compact('post'));
     }
 
     /**
@@ -88,4 +98,13 @@ class PostController extends Controller
     {
         //
     }
+
+    function search_post() {
+        return 'Hiiiiiii';
+    }
 }
+
+
+// SELECT * FROM posts WHERE title like '%new%'
+
+//
