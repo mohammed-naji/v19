@@ -46,7 +46,7 @@ class PostController extends Controller
      */
     public function create()
     {
-        //
+        return view('posts.create');
     }
 
     /**
@@ -54,7 +54,39 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        // validation
+        $request->validate([
+            'title' => 'required',
+            'image' => 'required|image|mimes:png,jpg,jpeg,svg',
+            'body' => 'required'
+        ]);
+
+        // upload file
+        $img = $request->file('image');
+        $img_name = rand().time().$img->getClientOriginalName();
+        $img->move(public_path('images'), $img_name);
+
+
+        // Store in database
+        // 1. using model object
+        // $post = new Post();
+        // $post->title = $request->title;
+        // $post->image = $img_name;
+        // $post->body = $request->body;
+        // $post->save();
+
+
+        // 2. using eloquent
+        $data = $request->except('_token');
+        $data['image'] = $img_name;
+
+        $post = Post::create($data);
+
+
+        // redirect to another page
+        return redirect()
+        ->route('posts.index')
+        ->with('msg', 'Post added successfully');
     }
 
     /**
@@ -99,8 +131,13 @@ class PostController extends Controller
         //
     }
 
-    function search_post() {
-        return 'Hiiiiiii';
+    function search_post(Request $request) {
+        $posts = Post::where('title', 'like', '%'.$request->q.'%')
+            ->latest('id')
+            ->limit(8)
+            ->get();
+
+        return $posts;
     }
 }
 
@@ -108,3 +145,12 @@ class PostController extends Controller
 // SELECT * FROM posts WHERE title like '%new%'
 
 //
+
+// class Person
+// {
+//     public $name;
+// }
+
+// $p = new Person();
+
+// $p->name

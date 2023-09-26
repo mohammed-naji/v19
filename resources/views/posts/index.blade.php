@@ -61,7 +61,22 @@
 </head>
 <body>
     <div class="container my-5">
-        <h2>All Posts</h2>
+
+        {{-- @dump(session('msg')) --}}
+        {{-- @if (session()->has('msg')) --}}
+
+        @if (session('msg'))
+            <div class="alert alert-success alert-dismissible fade show">
+                {{ session('msg') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
+
+        <div class="d-flex justify-content-between align-items-center">
+            <h2>All Posts</h2>
+            <a href="{{ route('posts.create') }}" class="btn btn-success px-4"><i class="fas fa-plus"></i> Add new Post</a>
+        </div>
+
         <form class="search-form" action="{{ route('posts.index') }}" method="GET">
             <div class="search">
                 <input type="text" name="q" value="{{ request()->q }}" class="form-control" placeholder="Search here..">
@@ -69,13 +84,7 @@
             </div>
             <div class="result">
                 <ul>
-                    {{-- <li>
-                        <a href="">
-                            <img src="https://via.placeholder.com/35x40" alt="">
 
-                            Lorem ipsum dolor <span>sit</span> amet.
-                        </a>
-                    </li> --}}
                 </ul>
             </div>
         </form>
@@ -91,7 +100,7 @@
             @foreach ($posts as $post)
             <tr>
                 <td>{{ $post->id }}</td>
-                <td><img width="80" src="{{ $post->image }}" alt=""></td>
+                <td><img width="80" src="{{ asset('images/'.$post->image) }}" alt=""></td>
                 <td>{{ $post->title }}</td>
                 <td>{{ $post->created_at->format('M d, Y') }}</td>
                 <td>{{ $post->updated_at->diffForHumans() }}</td>
@@ -108,8 +117,36 @@
         {{ $posts->appends('q', request()->q)->links() }}
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://unpkg.com/axios@1.1.2/dist/axios.min.js"></script>
     <script>
+
+const Toast = Swal.mixin({
+  toast: true,
+  position: 'top-end',
+  showConfirmButton: false,
+  timer: 3000,
+  timerProgressBar: true,
+  didOpen: (toast) => {
+    toast.addEventListener('mouseenter', Swal.stopTimer)
+    toast.addEventListener('mouseleave', Swal.resumeTimer)
+  }
+})
+
+        @if (session('msg'))
+        Toast.fire({
+            icon: 'success',
+            title: 'Signed in successfully'
+        })
+        @endif
+
+        setTimeout(() => {
+            document.querySelector('.alert').classList.remove('show')
+            setTimeout(() => {
+                document.querySelector('.alert').remove();
+            }, 300)
+        }, 2000);
 
         // AJAX
         // VanillaJS
@@ -123,14 +160,36 @@
 
         let inp = document.querySelector('.search-form input');
         inp.onkeyup = (e) => {
-            let q = inp.value
 
-            axios.get('{{ route("search_post") }}')
-            .then((res) => {
-                console.log(res);
-            }).catch((err) => {
-                console.log('Error');
-            });
+            if(inp.value.length >= 2) {
+                axios.get('{{ route("search_post") }}', {
+                    params: {
+                        q: inp.value
+                    }
+                })
+                .then((res) => {
+                    document.querySelector('.result ul').innerHTML = '';
+                    if(res.data.length > 0) {
+                        document.querySelector('.result').style.display = 'block';
+                        res.data.forEach(el => {
+                            let item = `<li>
+                                <a href="">
+                                    <img width="60" src="${el.image}" alt="">
+                                    ${el.title}
+                                </a>
+                            </li>`
+                            document.querySelector('.result ul').innerHTML += item
+                        });
+
+                    }else {
+                        document.querySelector('.result').style.display = 'none';
+                    }
+                }).catch((err) => {
+                    console.log('Error');
+                });
+            }else {
+                document.querySelector('.result').style.display = 'none';
+            }
 
         }
 
