@@ -4,66 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>All Posts</title>
+    <title>Trashed Posts</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
-    {{-- <script src="https://cdn.tailwindcss.com"></script> --}}
-    <style>
-        .search-form {
-            position: relative;
-            margin: 20px 0
-        }
 
-        .search-form button {
-            border: 0;
-            background: transparent;
-            position: absolute;
-            right: 10px;
-            top: 5px;
-        }
-
-        .result {
-            border: 1px solid #dee2e6;
-            border-radius: 5px;
-            position: absolute;
-            background: #fbfbfb;
-            width: 100%;
-            display: none;
-        }
-
-        .result ul {
-            margin: 0;
-            padding: 0;
-            list-style: none;
-        }
-
-        .result ul li a {
-            text-decoration: none;
-            color: #333;
-            display: block;
-            padding: 10px 20px;
-            border-bottom: 1px solid #ccc;
-            transition: all .3s ease;
-        }
-
-        .result ul li a img {
-            margin-right: 10px;
-        }
-
-        .result ul li a span {
-            color: #f00;
-        }
-
-        .result ul li a:hover {
-            background: #eee;
-        }
-    </style>
 </head>
 <body>
     <div class="container my-5">
-
-        {{-- @dump(session('msg')) --}}
-        {{-- @if (session()->has('msg')) --}}
 
         @if (session('msg'))
             <div class="alert alert-success alert-dismissible fade show">
@@ -72,64 +19,28 @@
             </div>
         @endif
 
-        <div class="d-flex justify-content-between align-items-center">
-            <h2>All Posts</h2>
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2>Trashed Posts</h2>
             <div>
-                <a href="{{ route('posts.trash') }}" class="btn btn-danger px-4"><i class="fas fa-trash"></i> Trashed Posts</a>
-                <a href="{{ route('posts.create') }}" class="btn btn-success px-4"><i class="fas fa-plus"></i> Add new Post</a>
+                <a href="{{ route('posts.index') }}" class="btn btn-dark px-4"><i class="fas fa-arrow-left"></i> All Posts</a>
             </div>
         </div>
 
-        <form class="search-form" action="{{ route('posts.index') }}" method="GET">
-            <div class="search">
-                <input type="text" name="q" value="{{ request()->q }}" class="form-control" placeholder="Search here..">
-                <button><i class="fas fa-search"></i></button>
-            </div>
-            <div class="result">
-                <ul>
-
-                </ul>
-            </div>
-        </form>
         <table class="table table-bordered table-hover table-striped">
             <tr class="table-dark">
                 <th>#</th>
-                <th>Image</th>
                 <th>Title</th>
-                <th>Created At</th>
-                <th>Updated At</th>
+                <th>Deleted At</th>
                 <th>Actions</th>
             </tr>
             @foreach ($posts as $post)
             <tr>
                 <td>{{ $post->id }}</td>
-                <td>
-
-                    @php
-                    if (file_exists(public_path('images/'.$post->image))) {
-                        $src = asset('images/'.$post->image);
-                    }else {
-                        $src = asset('images/no-image.png');
-                    }
-
-                    @endphp
-
-                    <img width="80" src="{{ $src }}" alt="">
-
-                </td>
                 <td>{{ $post->title }}</td>
-                <td>{{ $post->created_at->format('M d, Y') }}</td>
-                <td>{{ $post->updated_at->diffForHumans() }}</td>
+                <td>{{ $post->deleted_at->diffForHumans() }}</td>
                 <td>
-                    <a href="{{ route('posts.show', $post->id) }}" class="btn btn-success btn-sm"><i class="fas fa-eye"></i></a>
-                    <a href="{{ route('posts.edit', $post->id) }}" class="btn btn-primary btn-sm"><i class="fas fa-edit"></i></a>
-                    {{-- <a href="{{ route('posts.destroy', $post->id) }}" class="btn btn-danger btn-sm"><i class="fas fa-trash"></i></a> --}}
-                    <form class="d-inline" action="{{ route('posts.destroy', $post->id) }}" method="post">
-                        @csrf
-                        @method('delete')
-                        {{-- <button onclick="return confirm('Are you sure?')" class="btn btn-danger btn-sm"><i class="fas fa-trash"></i></button> --}}
-                        <button type="button" onclick="deleteItem(event)" class="btn btn-danger btn-sm"><i class="fas fa-trash"></i></button>
-                    </form>
+                    <a href="{{ route('posts.restore', $post->id) }}" class="btn btn-warning btn-sm"><i class="fas fa-undo"></i></a>
+                    <a onclick="return confirm('Are you sure (you cant rollback!)')" href="{{ route('posts.forcedelete', $post->id) }}" class="btn btn-danger btn-sm"><i class="fas fa-times"></i></a>
                 </td>
             </tr>
             @endforeach

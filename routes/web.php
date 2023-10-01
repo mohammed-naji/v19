@@ -179,6 +179,9 @@ Route::post('contact', [FormController::class, 'contact_data'])->name('contact_d
 
 // Route::delete('posts/{post}', [PostController::class, 'destroy'])->name('posts.destroy');
 
+Route::get('/posts/trash', [PostController::class, 'trash'])->name('posts.trash');
+Route::get('/posts/{post}/restore', [PostController::class, 'restore'])->name('posts.restore');
+Route::get('/posts/{post}/forcedelete', [PostController::class, 'forcedelete'])->name('posts.forcedelete');
 Route::resource('posts', PostController::class);
 Route::get('search-post', [PostController::class, 'search_post'])->name('search_post');
 //

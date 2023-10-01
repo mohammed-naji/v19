@@ -13,7 +13,7 @@
 
     <div class="container my-5 text-center">
         <h2>{{ $post->title }}</h2>
-        <img class="w-75" src="{{ $post->image }}" alt="">
+        <img class="w-25" src="{{ asset('images/'.$post->image) }}" alt="">
         <div class="desc">
             {{ $post->body }}
         </div>

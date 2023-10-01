@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Post;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\File;
 
 class PostController extends Controller
 {
@@ -104,7 +105,7 @@ class PostController extends Controller
 
         $post = Post::findOrFail($id);
 
-        // return view('posts.show', compact('post'));
+        return view('posts.show', compact('post'));
     }
 
     /**
@@ -112,7 +113,9 @@ class PostController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $post = Post::findOrFail($id);
+
+        return view('posts.edit', compact('post'));
     }
 
     /**
@@ -120,7 +123,32 @@ class PostController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        // validation
+        $request->validate([
+            'title' => 'required',
+            'image' => 'nullable|image|mimes:png,jpg,jpeg,svg',
+            'body' => 'required'
+        ]);
+
+        $post = Post::findOrFail($id);
+        $data = $request->except('_token', 'image');
+
+        if($request->hasFile('image')) {
+            // upload file
+            File::delete(public_path('images/'.$post->image));
+            $img = $request->file('image');
+            $img_name = rand().time().$img->getClientOriginalName();
+            $img->move(public_path('images'), $img_name);
+            $data['image'] = $img_name;
+        }
+
+        $post->update($data);
+
+
+        // redirect to another page
+        return redirect()
+        ->route('posts.index')
+        ->with('msg', 'Post updated successfully');
     }
 
     /**
@@ -128,7 +156,14 @@ class PostController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $post = Post::findOrFail($id);
+        // File::delete(public_path('images/'.$post->image));
+        $post->delete();
+        // Post::destroy($id);
+
+        return redirect()
+        ->route('posts.index')
+        ->with('msg', 'Post deleted successfully');
     }
 
     function search_post(Request $request) {
@@ -138,6 +173,33 @@ class PostController extends Controller
             ->get();
 
         return $posts;
+    }
+
+    function trash() {
+        // $posts = Post::latest('id')->whereNotNull('deleted_at')->get();
+        $posts = Post::onlyTrashed()->latest('id')->paginate(10);
+        return view('posts.trash', compact('posts'));
+    }
+
+    function restore($id) {
+        // $post = Post::onlyTrashed()->findOrFail($id)->update([
+        //     'deleted_at' => null
+        // ]);
+        Post::onlyTrashed()->findOrFail($id)->restore();
+
+        return redirect()
+        ->route('posts.trash')
+        ->with('msg', 'Post restored successfully');
+    }
+
+    function forcedelete($id) {
+        $post = Post::onlyTrashed()->findOrFail($id);
+        File::delete(public_path('images/'.$post->image));
+        $post->forceDelete();
+
+        return redirect()
+        ->route('posts.trash')
+        ->with('msg', 'Post deleted permanently successfully');
     }
 }
 
